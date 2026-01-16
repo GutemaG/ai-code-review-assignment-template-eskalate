@@ -2,7 +2,7 @@
 
 ## Candidate
 - Name: Birhanu Gudisa(bir13gud17@gmail.com)
-- Approximate time spent:
+- Approximate time spent: 45 minutes
 
 ---
 

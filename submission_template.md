@@ -64,17 +64,22 @@ If you were to test this function, what areas or scenarios would you focus on, a
 
 ## 1) Code Review Findings
 ### Critical bugs
-- 
+- Insufficient Validation: The check if "@" in email is drastically insufficient. Strings like "@" (just the symbol), "no_domain@", or "@no_user" count as valid.
 
 ### Edge cases & risks
-- 
+- Non-String Input: If the input list contains None, integers, or other objects, the if "@" in email line will raise a TypeError.
+- Whitespace: A string like " @ " is technically counted as valid in the original code but is not a usable email.
+- Multiple @ symbols: Strings like user@domain@com are counted as valid but are malformed.
 
 ### Code quality / design issues
-- 
+- Overly Simplistic: Email validation is notoriously complex. While a full Regex might be overkill for a simple counter, checking only for the @ symbol is too low a bar for most production use cases.
 
 ## 2) Proposed Fixes / Improvements
 ### Summary of changes
-- 
+- Type Safety: Added a check to ensure each element is a string before processing.
+- Implemented logic to verify the presence of exactly one @ symbol.
+- Added checks to ensure both the "user" and "domain" parts exist and are not empty.
+- Added a check to ensure the domain part contains a period (.) for the extension.
 
 ### Corrected code
 See `correct_task2.py`
@@ -84,21 +89,25 @@ See `correct_task2.py`
 
 ### Testing Considerations
 If you were to test this function, what areas or scenarios would you focus on, and why?
-
+- Format Boundary Tests: Inputs like user@domain, user@.com, @domain.com to ensure strict format adherence.
+- Type Safety: A list containing [None, 123, {}, "valid@email.com"] to ensure the function skips non-strings rather than crashing.
+- Whitespace: Emails with leading/trailing spaces (should likely be trimmed or rejected).
+- Double Symbols: An input like user@@domain.com to ensure count("@") logic works.
 ## 3) Explanation Review & Rewrite
 ### AI-generated explanation (original)
 > This function counts the number of valid email addresses in the input list. It safely ignores invalid entries and handles empty input correctly.
 
 ### Issues in original explanation
-- 
+- False Claim of Safety: It says it "safely ignores invalid entries," but passing an integer in the list would crash the code.
+- Misleading "Valid": It implies standard email validity, but the code only checks for the existence of an @ symbol.
 
 ### Rewritten explanation
-- 
+- This function counts valid email addresses by iterating through the input list. It validates that each entry is a string and performs structural checks: ensuring exactly one @ symbol exists, that both user and domain parts are non-empty, and that the domain contains a valid period. This approach prevents false positives (like "@") and crashes from non-string data.
 
 ## 4) Final Judgment
-- Decision: Approve / Request Changes / Reject
-- Justification:
-- Confidence & unknowns:
+- Decision: Request Changes
+- Justification: The validation logic is too weak to be useful in a real-world scenario (accepting "@" as a valid email), and the lack of type safety makes the function fragile.
+- Confidence & unknowns: High
 
 ---
 
